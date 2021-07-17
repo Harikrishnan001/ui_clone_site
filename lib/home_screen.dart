@@ -3,6 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
@@ -669,9 +670,7 @@ class ProgressPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) {
-    return true;
-  }
+  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }
 
 class MyProjectsWidget extends StatelessWidget {
@@ -814,8 +813,150 @@ class CurvedLineChart extends StatelessWidget {
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.0)),
       elevation: 5.0,
-      child: Container(
-        color: Colors.red,
+      child: Column(
+        children: [
+          Expanded(
+            child: Row(
+              children: [
+                Expanded(
+                  child: Center(
+                    child: Text(
+                      'Activity',
+                      style: GoogleFonts.montserrat(
+                        fontSize: 14.0,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+                Spacer(flex: 3),
+                Expanded(
+                  flex: 4,
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      ChartChip(category: 'Daily'),
+                      ChartChip(category: 'Weekly'),
+                      ChartChip(category: 'Monthly'),
+                      IconButton(
+                        icon: Icon(Icons.more_vert),
+                        onPressed: () {},
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          Expanded(
+            flex: 6,
+            child: Padding(
+              padding: const EdgeInsets.all(25.0),
+              child: LineChart(
+                LineChartData(
+                  maxX: 7,
+                  minX: 0,
+                  maxY: 100,
+                  minY: 0,
+                  borderData: FlBorderData(show: false),
+                  gridData: FlGridData(
+                    show: false,
+                  ),
+                  lineBarsData: [
+                    LineChartBarData(
+                      isCurved: true,
+                      spots: [
+                        FlSpot(0, 55),
+                        FlSpot(0.9, 75),
+                        FlSpot(1.8, 35),
+                        FlSpot(3, 98),
+                        FlSpot(3.8, 28),
+                        FlSpot(5, 73),
+                        FlSpot(6.1, 46),
+                        FlSpot(7, 74),
+                      ],
+                      colors: [Colors.green[800]!],
+                      dotData: FlDotData(
+                        show: false,
+                      ),
+                    ),
+                  ],
+                  titlesData: FlTitlesData(
+                    show: true,
+                    leftTitles: SideTitles(
+                      showTitles: true,
+                      getTextStyles: (value) => GoogleFonts.montserrat(
+                        fontSize: 14.0,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      getTitles: (value) {
+                        switch (value.toInt()) {
+                          case 30:
+                            return '30';
+                          case 50:
+                            return '50';
+                          case 70:
+                            return '70';
+                          case 100:
+                            return '100';
+                        }
+                        return '';
+                      },
+                    ),
+                    bottomTitles: SideTitles(
+                      showTitles: true,
+                      getTextStyles: (value) => GoogleFonts.montserrat(
+                        fontSize: 14.0,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      getTitles: (value) {
+                        switch (value.toInt()) {
+                          case 0:
+                            return 'Jan';
+                          case 1:
+                            return 'Feb';
+                          case 2:
+                            return 'Mar';
+                          case 3:
+                            return 'Apr';
+                          case 4:
+                            return 'May';
+                          case 5:
+                            return 'Jun';
+                          case 6:
+                            return 'Jul';
+                          case 7:
+                            return 'Aug';
+                        }
+                        return '';
+                      },
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class ChartChip extends StatelessWidget {
+  final String category;
+  const ChartChip({
+    Key? key,
+    required this.category,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Chip(
+      label: Text(
+        category,
+        style: GoogleFonts.montserrat(
+          fontSize: 12.0,
+        ),
       ),
     );
   }
