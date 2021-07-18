@@ -2,35 +2,33 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/rendering.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:site/responsive.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    print(MediaQuery.of(context).size.width);
     return Scaffold(
       backgroundColor: Colors.white,
       body: Row(
         children: [
-          Expanded(
-            flex: 1,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: DrawerTopWidget(),
-                ),
-                Expanded(
-                  flex: 3,
-                  child: DrawerBottomWidget(),
-                ),
-              ],
+          if (Responsive.isDesktop(context))
+            Expanded(
+              flex: 1,
+              child: DrawerWidget(),
             ),
-          ),
+          if (Responsive.isTablet(context))
+            Expanded(
+              flex: 1,
+              child: MiniDrawerWidget(),
+            ),
           Expanded(
-            flex: 4,
+            flex: Responsive.isTablet(context) ? 12 : 4,
             child: Column(
               children: [
                 Expanded(
@@ -131,6 +129,159 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+
+class MiniDrawerWidget extends StatelessWidget {
+  const MiniDrawerWidget({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Expanded(
+          child: Align(
+            alignment: Alignment.center,
+            child: CircleAvatar(
+              radius: 30,
+              child: FlutterLogo(size: 40),
+            ),
+          ),
+        ),
+        Expanded(
+          flex: 5,
+          child: Column(
+            children: [
+              MiniTileButton(
+                title: 'Dashboard',
+                icon: CupertinoIcons.home,
+                isSelected: true,
+              ),
+              SizedBox(height: 15.0),
+              MiniTileButton(
+                title: 'Members',
+                icon: CupertinoIcons.group,
+                isSelected: false,
+              ),
+              SizedBox(height: 15.0),
+              MiniTileButton(
+                title: 'Messages',
+                icon: Icons.message,
+                isSelected: false,
+              ),
+              SizedBox(height: 15.0),
+              MiniTileButton(
+                title: 'Labels',
+                icon: Icons.label_important_outline_rounded,
+                isSelected: false,
+              ),
+              SizedBox(height: 15.0),
+              MiniTileButton(
+                title: 'Reports',
+                icon: CupertinoIcons.clock,
+                isSelected: false,
+              ),
+              Spacer(),
+            ],
+          ),
+        ),
+        Expanded(
+          child: Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 15.0, vertical: 20.0),
+            child: AspectRatio(
+              aspectRatio: 1,
+              child: BackgroundIcon(
+                icon: Icons.logout,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class MiniTileButton extends StatefulWidget {
+  final String title;
+  final IconData icon;
+  final bool isSelected;
+
+  const MiniTileButton({
+    Key? key,
+    required this.title,
+    required this.icon,
+    required this.isSelected,
+  }) : super(key: key);
+
+  @override
+  _MiniTileButtonState createState() => _MiniTileButtonState();
+}
+
+class _MiniTileButtonState extends State<MiniTileButton> {
+  bool _isHovering = false;
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(35.0),
+      child: MouseRegion(
+        onHover: (event) {
+          setState(() {
+            _isHovering = true;
+          });
+        },
+        onExit: (event) {
+          setState(() {
+            _isHovering = false;
+          });
+        },
+        child: Material(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(35.0)),
+          color: widget.isSelected
+              ? Colors.green[700]!.withBlue(80)
+              : _isHovering
+                  ? Colors.green[100]
+                  : Colors.white,
+          child: IconButton(
+            padding: const EdgeInsets.all(12.0),
+            mouseCursor: MouseCursor.defer,
+            tooltip: widget.title,
+            onPressed: () {},
+            icon: Icon(
+              widget.icon,
+              color: widget.isSelected
+                  ? Colors.white
+                  : _isHovering
+                      ? Colors.white
+                      : Colors.grey,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class DrawerWidget extends StatelessWidget {
+  const DrawerWidget({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: DrawerTopWidget(),
+        ),
+        Expanded(
+          flex: 3,
+          child: DrawerBottomWidget(),
+        ),
+      ],
     );
   }
 }
