@@ -14,41 +14,136 @@ class HomeScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     print(MediaQuery.of(context).size.width);
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Row(
-        children: [
-          if (Responsive.isDesktop(context))
-            Expanded(
-              flex: 1,
-              child: DrawerWidget(),
-            ),
-          if (Responsive.isTablet(context))
-            Expanded(
-              flex: 1,
-              child: MiniDrawerWidget(),
-            ),
-          Expanded(
-            flex: Responsive.isTablet(context) ? 12 : 4,
-            child: Column(
-              children: [
-                Expanded(
-                  flex: 1,
-                  child: WindowHeader(),
-                ),
-                Expanded(
-                  flex: 8,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 10.0,
-                      horizontal: 30.0,
+      drawer: Drawer(child: DrawerWidget()),
+      appBar: (Responsive.isMobile(context))
+          ? AppBar(
+              toolbarHeight: 130,
+              backgroundColor: Colors.white,
+              elevation: 5,
+              title: Center(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    GreetingText(
+                      user: 'Ryan',
+                      timeOfDay: 'Morning',
                     ),
-                    child: Row(
-                      children: [
-                        Expanded(
-                          flex: 5,
+                    SearchField(),
+                  ],
+                ),
+              ),
+              leading: LeadingMenuButton(),
+            )
+          : null,
+      backgroundColor: Colors.white,
+      body: Responsive.isMobile(context) ? MobileView() : WideScreenView(),
+    );
+  }
+}
+
+class LeadingMenuButton extends StatelessWidget {
+  const LeadingMenuButton({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return IconButton(
+      icon: Icon(
+        Icons.menu,
+        color: Colors.black,
+      ),
+      onPressed: () {
+        Scaffold.of(context).openDrawer();
+      },
+    );
+  }
+}
+
+class MobileView extends StatelessWidget {
+  const MobileView({Key? key}) : super(key: key);
+  static const _list = <Widget>[
+    SizedBox(
+      height: 400,
+      child: CurvedLineChart(),
+    ),
+    SizedBox(
+      height: 250,
+      child: StatusCard(),
+    ),
+    SizedBox(
+      height: 350,
+      child: TeamMembersCard(),
+    ),
+    SizedBox(
+      height: 300,
+      child: PriorityProjectsWidget(),
+    ),
+    SizedBox(
+      height: 300,
+      child: MyProjectsWidget(),
+    ),
+    SizedBox(
+      height: 100,
+      child: UpgradeCard(),
+    ),
+  ];
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      itemBuilder: (context, index) => Padding(
+        padding: const EdgeInsets.symmetric(vertical: 6.0, horizontal: 10.0),
+        child: _list[index],
+      ),
+      itemCount: _list.length,
+    );
+  }
+}
+
+class WideScreenView extends StatelessWidget {
+  const WideScreenView({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        if (Responsive.isDesktop(context))
+          Expanded(
+            flex: 1,
+            child: DrawerWidget(),
+          ),
+        if (Responsive.isTablet(context))
+          Expanded(
+            flex: 1,
+            child: MiniDrawerWidget(),
+          ),
+        Expanded(
+          flex: Responsive.isTablet(context) ? 12 : 4,
+          child: Column(
+            children: [
+              Expanded(
+                  flex: Responsive.isTablet(context) ? 2 : 1,
+                  child: WindowHeader()),
+              Expanded(
+                flex: Responsive.isTablet(context) ? 14 : 8,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 10.0,
+                    horizontal: 15.0,
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 5,
+                        child: Scrollbar(
+                          isAlwaysShown: true,
                           child: SingleChildScrollView(
                             child: SizedBox(
-                              height: MediaQuery.of(context).size.height * 1.2,
+                              height: Responsive.isTablet(context)
+                                  ? MediaQuery.of(context).size.height * 1.8
+                                  : MediaQuery.of(context).size.height * 1.2,
                               child: LayoutBuilder(
                                 builder: (context, constraints) {
                                   return Padding(
@@ -56,62 +151,46 @@ class HomeScreen extends StatelessWidget {
                                         vertical: 15.0),
                                     child: Row(
                                       children: [
-                                        SizedBox(
-                                          width: constraints.maxWidth * 2 / 3,
-                                          child: Column(
-                                            children: [
-                                              Expanded(
-                                                flex: 1,
-                                                child: CurvedLineChart(),
+                                        (!Responsive.isTablet(context))
+                                            ? SizedBox(
+                                                width: constraints.maxWidth *
+                                                    2 /
+                                                    3,
+                                                child: CenterView(),
+                                              )
+                                            : Expanded(
+                                                child: CenterView(),
                                               ),
-                                              SizedBox(height: 25.0),
-                                              Expanded(
-                                                flex: 1,
-                                                child: Row(
-                                                  children: [
-                                                    Expanded(
-                                                      flex: 7,
-                                                      child: MyProjectsWidget(),
-                                                    ),
-                                                    SizedBox(width: 30.0),
-                                                    Expanded(
-                                                      flex: 5,
-                                                      child:
-                                                          PriorityProjectsWidget(),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
                                         SizedBox(width: 15.0),
-                                        SizedBox(
-                                          width: constraints.maxWidth * 1 / 3 -
-                                              15.0,
-                                          child: Padding(
-                                            padding: const EdgeInsets.symmetric(
-                                              vertical: 10.0,
-                                              horizontal: 10.0,
-                                            ),
-                                            child: Column(
-                                              children: [
-                                                Expanded(
-                                                  flex: 2,
-                                                  child: StatusCard(),
-                                                ),
-                                                Expanded(
-                                                  flex: 3,
-                                                  child: TeamMembersCard(),
-                                                ),
-                                                Expanded(
-                                                  flex: 1,
-                                                  child: UpgradeCard(),
-                                                )
-                                              ],
+                                        if (!Responsive.isTablet(context))
+                                          SizedBox(
+                                            width:
+                                                constraints.maxWidth * 1 / 3 -
+                                                    15.0,
+                                            child: Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                vertical: 10.0,
+                                                horizontal: 10.0,
+                                              ),
+                                              child: Column(
+                                                children: [
+                                                  Expanded(
+                                                    flex: 2,
+                                                    child: StatusCard(),
+                                                  ),
+                                                  Expanded(
+                                                    flex: 3,
+                                                    child: TeamMembersCard(),
+                                                  ),
+                                                  Expanded(
+                                                    flex: 1,
+                                                    child: UpgradeCard(),
+                                                  )
+                                                ],
+                                              ),
                                             ),
                                           ),
-                                        ),
                                       ],
                                     ),
                                   );
@@ -120,15 +199,71 @@ class HomeScreen extends StatelessWidget {
                             ),
                           ),
                         ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class CenterView extends StatelessWidget {
+  const CenterView({
+    Key? key,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Expanded(
+          flex: 1,
+          child: CurvedLineChart(),
+        ),
+        SizedBox(height: 20.0),
+        if (Responsive.isTablet(context))
+          Expanded(
+            child: Row(
+              children: [
+                Expanded(
+                  child: StatusCard(),
+                ),
+                SizedBox(width: 30.0),
+                Expanded(
+                  child: TeamMembersCard(),
                 ),
               ],
             ),
           ),
-        ],
-      ),
+        SizedBox(height: 20.0),
+        Expanded(
+          flex: 1,
+          child: Row(
+            children: [
+              Expanded(
+                flex: (Responsive.isTablet(context)) ? 1 : 7,
+                child: MyProjectsWidget(),
+              ),
+              SizedBox(width: 30.0),
+              Expanded(
+                flex: (Responsive.isTablet(context)) ? 1 : 5,
+                child: PriorityProjectsWidget(),
+              ),
+            ],
+          ),
+        ),
+        if (Responsive.isTablet(context)) SizedBox(height: 20.0),
+        if (Responsive.isTablet(context))
+          SizedBox(
+            height: 120,
+            child: UpgradeCard(),
+          ),
+      ],
     );
   }
 }
@@ -187,16 +322,26 @@ class MiniDrawerWidget extends StatelessWidget {
           ),
         ),
         Expanded(
-          child: Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 15.0, vertical: 20.0),
-            child: AspectRatio(
-              aspectRatio: 1,
-              child: BackgroundIcon(
-                icon: Icons.logout,
-              ),
-            ),
-          ),
+          child: Responsive.isTablet(context)
+              ? Column(
+                  children: [
+                    MiniTileButton(
+                      title: 'Logout',
+                      icon: Icons.logout,
+                      isSelected: true,
+                    ),
+                  ],
+                )
+              : Padding(
+                  padding: const EdgeInsets.symmetric(
+                      horizontal: 15.0, vertical: 20.0),
+                  child: AspectRatio(
+                    aspectRatio: 1,
+                    child: BackgroundIcon(
+                      icon: Icons.logout,
+                    ),
+                  ),
+                ),
         ),
       ],
     );
@@ -367,14 +512,18 @@ class StatusCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 15.0),
+      padding: (Responsive.isTablet(context))
+          ? EdgeInsets.all(0.0)
+          : EdgeInsets.only(bottom: 15.0),
       child: Card(
         elevation: 5,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(20.0),
         ),
         child: Padding(
-          padding: const EdgeInsets.all(5.0),
+          padding: (Responsive.isTablet(context))
+              ? EdgeInsets.all(0.0)
+              : EdgeInsets.all(5.0),
           child: Column(
             children: [
               ProgressCard(
@@ -407,7 +556,9 @@ class TeamMembersCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.only(top: 10.0, bottom: 30.0),
+      margin: Responsive.isTablet(context)
+          ? EdgeInsets.only(top: 5.0, bottom: 5.0)
+          : EdgeInsets.only(top: 10.0, bottom: 30.0),
       elevation: 5,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20.0),
@@ -448,7 +599,8 @@ class TeamMembersCard extends StatelessWidget {
               child: Align(
                 alignment: Alignment.bottomRight,
                 child: Padding(
-                  padding: const EdgeInsets.only(bottom: 10.0),
+                  padding: EdgeInsets.only(
+                      bottom: (Responsive.isTablet(context)) ? 0.0 : 10.0),
                   child: Text(
                     'See all teams',
                     style: GoogleFonts.montserrat(
@@ -1122,13 +1274,32 @@ class WindowHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 30.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          GreetingText(timeOfDay: 'morning', user: 'Ryan'),
-          SearchField(),
-        ],
+      child: Responsive(
+        desktop: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            GreetingText(timeOfDay: 'morning', user: 'Ryan'),
+            SearchField(),
+          ],
+        ),
+        mobile: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            GreetingText(timeOfDay: 'morning', user: 'Ryan'),
+            SearchField(),
+          ],
+        ),
+        tablet: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            GreetingText(timeOfDay: 'morning', user: 'Ryan'),
+            Spacer(),
+            SearchField(),
+          ],
+        ),
       ),
     );
   }
@@ -1142,9 +1313,12 @@ class SearchField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Row(
+      mainAxisSize: MainAxisSize.min,
       children: [
         SizedBox(
-          width: 300,
+          width: MediaQuery.of(context).size.width < 300
+              ? MediaQuery.of(context).size.width - 20
+              : 300,
           child: TextField(
             cursorHeight: 20,
             style: GoogleFonts.montserrat(
