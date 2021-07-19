@@ -12,12 +12,11 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print(MediaQuery.of(context).size.width);
     return Scaffold(
       drawer: Drawer(child: DrawerWidget()),
       appBar: (Responsive.isMobile(context))
           ? AppBar(
-              toolbarHeight: 130,
+              toolbarHeight: 140,
               backgroundColor: Colors.white,
               elevation: 5,
               title: Center(
@@ -27,7 +26,9 @@ class HomeScreen extends StatelessWidget {
                     GreetingText(
                       user: 'Ryan',
                       timeOfDay: 'Morning',
+                      fontSize: 20,
                     ),
+                    SizedBox(height: 4.0),
                     SearchField(),
                   ],
                 ),
@@ -64,7 +65,7 @@ class MobileView extends StatelessWidget {
   const MobileView({Key? key}) : super(key: key);
   static const _list = <Widget>[
     SizedBox(
-      height: 400,
+      height: 320,
       child: CurvedLineChart(),
     ),
     SizedBox(
@@ -80,11 +81,11 @@ class MobileView extends StatelessWidget {
       child: PriorityProjectsWidget(),
     ),
     SizedBox(
-      height: 300,
+      height: 350,
       child: MyProjectsWidget(),
     ),
     SizedBox(
-      height: 100,
+      height: 130,
       child: UpgradeCard(),
     ),
   ];
@@ -918,7 +919,7 @@ class ProgressIndicator extends StatelessWidget {
     return Container(
       width: double.infinity,
       child: CustomPaint(
-        painter: ProgressPainter(),
+        painter: ProgressPainter(isMobile: Responsive.isMobile(context)),
         child: Center(
           child: Row(
             mainAxisSize: MainAxisSize.max,
@@ -928,7 +929,7 @@ class ProgressIndicator extends StatelessWidget {
               Text(
                 '75',
                 style: GoogleFonts.montserrat(
-                  fontSize: 40.0,
+                  fontSize: Responsive.isMobile(context) ? 25.0 : 40.0,
                   fontWeight: FontWeight.w600,
                   color: Colors.black,
                 ),
@@ -951,6 +952,10 @@ class ProgressIndicator extends StatelessWidget {
 }
 
 class ProgressPainter extends CustomPainter {
+  final bool isMobile;
+
+  ProgressPainter({this.isMobile = false});
+
   @override
   void paint(Canvas canvas, Size size) {
     final h = size.height;
@@ -962,7 +967,7 @@ class ProgressPainter extends CustomPainter {
     final rect =
         Rect.fromCenter(center: Offset(w / 2, h / 2), width: l, height: l);
     final Paint paint = Paint()
-      ..strokeWidth = 25.0
+      ..strokeWidth = isMobile ? 15.0 : 40.0
       ..style = PaintingStyle.stroke
       ..shader = SweepGradient(
         colors: [Colors.white, Colors.red, Colors.white],
@@ -973,7 +978,9 @@ class ProgressPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+  bool shouldRepaint(ProgressPainter oldDelegate) {
+    return oldDelegate.isMobile != isMobile;
+  }
 }
 
 class MyProjectsWidget extends StatelessWidget {
@@ -1132,7 +1139,10 @@ class CurvedLineChart extends StatelessWidget {
                     ),
                   ),
                 ),
-                Spacer(flex: 3),
+                if (!Responsive.isMobile(context))
+                  Spacer(flex: 3)
+                else
+                  SizedBox(width: 10.0),
                 Expanded(
                   flex: 4,
                   child: Row(
@@ -1191,6 +1201,7 @@ class CurvedLineChart extends StatelessWidget {
                       getTextStyles: (value) => GoogleFonts.montserrat(
                         fontSize: 14.0,
                         fontWeight: FontWeight.w500,
+                        color: Colors.black,
                       ),
                       getTitles: (value) {
                         switch (value.toInt()) {
@@ -1211,6 +1222,7 @@ class CurvedLineChart extends StatelessWidget {
                       getTextStyles: (value) => GoogleFonts.montserrat(
                         fontSize: 14.0,
                         fontWeight: FontWeight.w500,
+                        color: Colors.black,
                       ),
                       getTitles: (value) {
                         switch (value.toInt()) {
@@ -1312,39 +1324,41 @@ class SearchField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        SizedBox(
-          width: MediaQuery.of(context).size.width < 300
-              ? MediaQuery.of(context).size.width - 20
-              : 300,
-          child: TextField(
-            cursorHeight: 20,
-            style: GoogleFonts.montserrat(
-              fontSize: 14.0,
-              color: Colors.black,
-              fontWeight: FontWeight.normal,
-            ),
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: Colors.grey[300],
-              hintText: 'Search projects',
-              hintStyle: GoogleFonts.montserrat(
+    return FittedBox(
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SizedBox(
+            width: MediaQuery.of(context).size.width < 260
+                ? MediaQuery.of(context).size.width - 20
+                : 260,
+            child: TextField(
+              cursorHeight: 20,
+              style: GoogleFonts.montserrat(
                 fontSize: 14.0,
-                color: Colors.grey,
+                color: Colors.black,
                 fontWeight: FontWeight.normal,
               ),
-              border: OutlineInputBorder(
-                borderSide: BorderSide.none,
-                borderRadius: BorderRadius.circular(10.0),
+              decoration: InputDecoration(
+                filled: true,
+                fillColor: Colors.grey[300],
+                hintText: 'Search projects',
+                hintStyle: GoogleFonts.montserrat(
+                  fontSize: 14.0,
+                  color: Colors.grey,
+                  fontWeight: FontWeight.normal,
+                ),
+                border: OutlineInputBorder(
+                  borderSide: BorderSide.none,
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
               ),
             ),
           ),
-        ),
-        SizedBox(width: 5.0),
-        BackgroundIcon(icon: Icons.search, padding: 10.0),
-      ],
+          SizedBox(width: 5.0),
+          BackgroundIcon(icon: Icons.search, padding: 10.0),
+        ],
+      ),
     );
   }
 }
@@ -1352,10 +1366,12 @@ class SearchField extends StatelessWidget {
 class GreetingText extends StatelessWidget {
   final String timeOfDay;
   final String user;
+  final double fontSize;
   const GreetingText({
     Key? key,
     this.timeOfDay = 'time',
     this.user = 'User',
+    this.fontSize = 24.0,
   }) : super(key: key);
 
   @override
@@ -1364,7 +1380,7 @@ class GreetingText extends StatelessWidget {
       text: TextSpan(
         text: 'Good $timeOfDay,  ',
         style: GoogleFonts.montserrat(
-          fontSize: 24.0,
+          fontSize: fontSize,
           color: Colors.black,
           fontWeight: FontWeight.w600,
         ),
